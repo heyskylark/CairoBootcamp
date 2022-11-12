@@ -1,12 +1,12 @@
 import './App.css';
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { connect } from "get-starknet"
 import { Contract } from "starknet"
 import { toBN } from "starknet/dist/utils/number"
 
-import contractAbi from "./contract_abi.json"
+import contractAbi from "./storage_abi.json"
 
-const contractAddress = "0x0704ed6b41f5d9dfdc5037c627d53ee52aef0675ed47ba59b57b8152c0144a9e"
+const contractAddress = "0x06e44b1a9d6b3732090723e2baf1b182c5c1ecc772596c318664e7c550361b32"
 
 
 function App() {
@@ -15,6 +15,8 @@ function App() {
   const [retrievedBalance, setRetrievedBalance] = useState('')
   const [isConnected, setIsConnected] = useState(false)
 
+  const [stringBalance, setStringBalance] = useState("");
+  const [balance, setBalance] = useState(0);
 
   const connectWallet = async() => {
     try{
@@ -24,7 +26,7 @@ function App() {
       // set up the provider
       setProvider(starknet.account)
       // set wallet address
-     setAddress(starknet.selectedAddress)
+      setAddress(starknet.selectedAddress)
       // set connection flag
       setIsConnected(true)
       
@@ -34,14 +36,28 @@ function App() {
     }
   }
 
-  const increaseBalanceFunction = async() => {
+  const submitBalance =(e) => {
+    const length = e.target.value.length
+    const value = parseInt(e.target.value, 10)
+
+    if (length === 0) {
+      setStringBalance("")
+      setBalance(0)
+    } else if(!isNaN(value)) {
+      setStringBalance(e.target.value)
+      setBalance(value)
+    }
+  }
+
+  const setBalanceFunction = async() => {
     try{
       // create a contract object based on the provider, address and abi
       const contract = new Contract(contractAbi, contractAddress, provider)
       
       // call the increase_balance function
-      await contract.increase_balance(13)
-      
+      await contract.set_balance(balance)
+
+      setBalance(0);
     }
     catch(error){
       alert(error.message)
@@ -63,6 +79,7 @@ function App() {
       alert(error.message)
     }
   }
+
   return (
     <div className="App">
       <header className="App-header">
@@ -86,9 +103,8 @@ function App() {
 
 
               <div className="cardForm">
-                {/* <input type="text" className="input" placeholder="Enter Name" onChange={(e) => setName(e.target.value)} /> */}
-
-                <input type="submit" className="button" value="Add ETH  " onClick={() => increaseBalanceFunction()} />
+                <input type="number" className="input" placeholder="Balance" value={stringBalance} onChange={(e) => submitBalance(e)} />
+                <input type="submit" className="button" value="Add ETH" onClick={() => setBalanceFunction()} />
               </div>
 
               <hr />
