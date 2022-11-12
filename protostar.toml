@@ -1,5 +1,7 @@
-["protostar.config"]
-protostar_version = "0.6.0"
+[project]
+protostar-version = "0.7.0"
+lib-path = "."
 
-["protostar.project"]
-libs_path = "."
+[contracts]
+storage = ["exercises/contracts/storage/storage.cairo"]
+
